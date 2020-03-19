@@ -2,7 +2,7 @@
   "name": "victory-road",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://iamdarkes.github.io/victory-road",
+  "homepage": "/",
   "dependencies": {
     "@material-ui/core": "4.9.4",
     "@testing-library/jest-dom": "4.2.4",
