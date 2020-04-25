@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import './App.css'
 import level1 from './pokemon/10.png'
 import level2 from './pokemon/213.png'
@@ -64,6 +64,19 @@ const App = () => (
         <VictoryRoad/>
     </ThemeProvider>
 )
+
+const redColor = {
+    '--special-color': '#FE0100'
+}
+
+const greenColor = {
+    '--special-color': '#007F00'
+}
+
+const yellowColor = {
+    '--special-color': '#FBC211'
+}
+
 const useStyles = makeStyles(theme => ({
     grid: {
         backgroundColor: '#F5F5F5',
@@ -88,23 +101,9 @@ const useStyles = makeStyles(theme => ({
             display: 'inline'
         }
     },
-    redWrapper: {
+    colorWrapper: {
         padding: '0px 0px 0px 20px',
-        color: '#FE0100',
-        [theme.breakpoints.up('md')]: {
-            display: 'inline'
-        }
-    },
-    yellowWrapper: {
-        padding: '0px 0px 0px 20px',
-        color: '#FBC211',
-        [theme.breakpoints.up('md')]: {
-            display: 'inline'
-        }
-    },
-    greenWrapper: {
-        padding: '0px 0px 0px 20px',
-        color: '#007F00',
+        color: 'var(--special-color)',
         [theme.breakpoints.up('md')]: {
             display: 'inline'
         }
@@ -133,6 +132,7 @@ function VictoryRoad() {
     const [goalLevel, setGoalLevel] = useState(40)
     const classes = useStyles()
     const shouldFullWidth = useMediaQuery(theme => theme.breakpoints.down('sm'))
+    const [color, setColor] = React.useState(redColor)
 
     const handleXPInputChange = event => {
         if (event.target.value > 20000000) {
@@ -143,6 +143,19 @@ function VictoryRoad() {
             setCurrentXP(event.target.value === '' ? '' : Number(event.target.value))
         }
     }
+    const handleStyle = useCallback(() => {
+        if (currentXP / levels[goalLevel - 1] > 0.9) {
+            setColor(greenColor)
+        } else if (currentXP / levels[goalLevel - 1] > 0.5) {
+            setColor(yellowColor)
+        } else {
+            setColor(redColor)
+        }
+    }, [currentXP, goalLevel, levels])
+
+    useEffect(() => {
+        handleStyle()
+    }, [handleStyle])
 
     const handleSliderChange = (event, newValue) => {
         setCurrentXP(newValue)
@@ -156,15 +169,6 @@ function VictoryRoad() {
         return images[calculateLevel() - 1]
     }
 
-    const handleStyle = () => {
-        if (currentXP / levels[goalLevel - 1] > 0.9) {
-            return 'green'
-        } else if (currentXP / levels[goalLevel - 1] > 0.5) {
-            return 'yellow'
-        } else {
-            return 'red'
-        }
-    }
 
     const calculateRemaining = () => {
         if (goalLevel === 0 || typeof goalLevel !== 'number' || levels[goalLevel - 1] - currentXP < 0) {
@@ -240,21 +244,9 @@ function VictoryRoad() {
                                 <div className={classes.wrapper}>
                                     XP needed:
                                 </div>
-                                {handleStyle() === 'green' &&
-                                <div className={classes.greenWrapper}>
+                                <div className={classes.colorWrapper} style={color}>
                                     {calculateRemaining()}
                                 </div>
-                                }
-                                {handleStyle() === 'yellow' &&
-                                <div className={classes.yellowWrapper}>
-                                    {calculateRemaining()}
-                                </div>
-                                }
-                                {handleStyle() === 'red' &&
-                                <div className={classes.redWrapper}>
-                                    {calculateRemaining()}
-                                </div>
-                                }
                             </Typography>
 
                             <Typography
